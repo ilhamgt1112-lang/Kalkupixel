@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Kalkulator pw Fish Gems </title>
+<style>
+body{
+  font-family:Arial;
+  text-align:center;
+  background:#111;
+  color:white;
+  margin:0;
+  padding:10px;
+}
+
+html, body{
+  overflow-y:auto;
+}
+
+.box{
+  border:2px solid #444;
+  padding:15px;
+  margin:15px auto;
+  width:90%;
+  max-width:400px;
+  background:#1b1b1b;
+  border-radius:10px;
+}
+
+select,input,button{
+  padding:10px;
+  margin:5px;
+  font-size:16px;
+}
+
+#result,#totalAll,#calcResult{
+  margin-top:10px;
+  font-size:20px;
+  color:lime;
+}
+
+#history{
+  text-align:left;
+  max-height:150px;
+  overflow:auto;
+  background:#000;
+  padding:10px;
+  border-radius:8px;
+  font-size:14px;
+}
+
+#rouletteResult{
+  margin-top:10px;
+  font-size:18px;
+  color:cyan;
+  white-space:pre-line;
+}
+
+#saldo{
+  margin-top:5px;
+  color:yellow;
+}
+
+/* LOGIN */
+#loginBox{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:9999;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox">
+  <h2>🔑 Masukin Kode</h2>
+  <input type="password" id="kodeInput" placeholder="Masukin kode...">
+  <br>
+  <button onclick="cekKode()">Masuk</button>
+  <p id="error" style="color:red;"></p>
+</div>
+
+<h1>🎣 Kalkulator Fish Gems PRO</h1>
+
+<div class="box">
+<h2>🐟 Hitung Ikan</h2>
+
+<select id="fish">
+  <option value="10">Herring</option>
+  <option value="10">Kingfish</option>
+  <option value="15">Goldfish</option>
+  <option value="15">Butterflyfish</option>
+  <option value="20">Carp</option>
+  <option value="20">Halibut</option>
+  <option value="30">Sea Angler</option>
+  <option value="40">Tuna</option>
+  <option value="30">Piranha</option>
+  <option value="80">Acid Puffer</option>
+  <option value="5">Dumb Fish</option>
+</select>
+
+<br>
+
+<select id="size">
+  <option value="1">Tiny</option>
+  <option value="4">Small</option>
+  <option value="7">Medium</option>
+  <option value="10">Large</option>
+  <option value="30">Huge</option>
+</select>
+
+<br>
+
+<input type="number" id="jumlah" placeholder="Jumlah ikan">
+
+<br>
+
+<button onclick="tambahIkan()">➕ Tambah ke List</button>
+
+<div id="result"></div>
+</div>
+
+<div class="box">
+<h2>📜 History</h2>
+<div id="history"></div>
+
+<button onclick="hitungTotal()">💰 Total Semua</button>
+<button onclick="resetAll()">🗑 Reset</button>
+
+<div id="totalAll"></div>
+</div>
+
+<div class="box">
+<h2>🧮 Kalkulator Biasa</h2>
+
+<input type="number" id="num1" placeholder="Angka 1">
+<input type="number" id="num2" placeholder="Angka 2">
+
+<br>
+
+<button onclick="calc('+')">+</button>
+<button onclick="calc('-')">-</button>
+<button onclick="calc('*')">×</button>
+<button onclick="calc('/')">÷</button>
+
+<div id="calcResult"></div>
+</div>
+
+<div class="box">
+<h2>🎰 Roulette VS Bot</h2>
+
+<input type="number" id="bet" placeholder="Taruhan gems">
+
+<br>
+
+<button onclick="spin()">🎯 SPIN</button>
+
+<div id="rouletteResult"></div>
+<div id="saldo">💰 Saldo: 1.000</div>
+</div>
+
+<script>
+let list = [];
+let saldo = 1000;
+
+// FORMAT TITIK
+function format(num){
+  return num.toLocaleString("id-ID");
+}
+
+// LOGIN
+function cekKode(){
+  let kode = document.getElementById("kodeInput").value;
+
+  if(kode === "demo123"){
+    document.getElementById("loginBox").style.display = "none";
+  }else{
+    document.getElementById("error").innerText = "❌ Kode salah!";
+  }
+}
+
+// TAMBAH IKAN
+function tambahIkan(){
+  let fish = document.getElementById("fish");
+  let size = document.getElementById("size");
+
+  let fishText = fish.options[fish.selectedIndex].text;
+  let base = parseInt(fish.value);
+
+  let sizeText = size.options[size.selectedIndex].text;
+  let sizeVal = parseInt(size.value);
+
+  let jumlah = parseInt(document.getElementById("jumlah").value);
+
+  if(isNaN(jumlah) || jumlah <= 0){
+    alert("Masukin jumlah dulu!");
+    return;
+  }
+
+  let total = base * sizeVal * jumlah;
+  list.push(total);
+
+  document.getElementById("result").innerText =
+    "Ditambah: " + format(total) + " gems";
+
+  document.getElementById("history").innerHTML += `
+    <div>${fishText} (${sizeText}) x${jumlah} = 💰 ${format(total)}</div>
+  `;
+}
+
+// TOTAL
+function hitungTotal(){
+  let total = list.reduce((a,b)=>a+b,0);
+
+  document.getElementById("totalAll").innerText =
+    "🔥 TOTAL SEMUA: " + format(total) + " gems";
+}
+
+// RESET
+function resetAll(){
+  list = [];
+  document.getElementById("history").innerHTML = "";
+  document.getElementById("totalAll").innerText = "";
+}
+
+// KALKULATOR
+function calc(op){
+  let a = parseFloat(document.getElementById("num1").value);
+  let b = parseFloat(document.getElementById("num2").value);
+
+  if(isNaN(a) || isNaN(b)){
+    alert("Masukin angka dulu!");
+    return;
+  }
+
+  let hasil;
+  if(op==='+') hasil = a+b;
+  if(op==='-') hasil = a-b;
+  if(op==='*') hasil = a*b;
+  if(op==='/') hasil = a/b;
+
+  document.getElementById("calcResult").innerText =
+    "Hasil: " + format(hasil);
+}
+
+// ROULETTE
+function spin(){
+  let bet = parseInt(document.getElementById("bet").value);
+
+  if(isNaN(bet) || bet <= 0){
+    alert("Masukin taruhan dulu!");
+    return;
+  }
+
+  if(bet > saldo){
+    alert("Saldo gak cukup!");
+    return;
+  }
+
+  let player = Math.floor(Math.random()*100) + 1;
+  let bot = Math.floor(Math.random()*100) + 1;
+
+  let hasil = "";
+
+  if(player > bot){
+    let hadiah = bet * 2;
+    saldo += hadiah;
+    hasil = `🎉 MENANG!\nLu: ${player} | Bot: ${bot}\n+${format(hadiah)} gems`;
+  }
+  else if(player < bot){
+    saldo -= bet;
+    hasil = `💀 KALAH!\nLu: ${player} | Bot: ${bot}\n-${format(bet)} gems`;
+  }
+  else{
+    hasil = `🤝 SERI!\nLu: ${player} | Bot: ${bot}`;
+  }
+
+  document.getElementById("rouletteResult").innerText = hasil;
+  document.getElementById("saldo").innerText = "💰 Saldo: " + format(saldo);
+}
+</script>
+
+</body>
+</html>
